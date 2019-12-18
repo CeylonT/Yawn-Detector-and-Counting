@@ -4,10 +4,10 @@ import numpy as np
 import json
 from firebase import firebase
 import pyautogui
-from gcloud import storage
+from google.cloud import storage
 
-client = storage.Client().from_service_account_json('KubDeeDee-860f4a212946.json')
-bucket = client.get_bucket('gs://kubdeedee-3f5e2.appspot.com')
+client = storage.Client.from_service_account_json('KubDeeDee-860f4a212946.json')
+bucket = client.get_bucket('kubdeedee-3f5e2.appspot.com')
 
 firebase = firebase.FirebaseApplication('https://kubdeedee-3f5e2.firebaseio.com', None)
 
@@ -94,13 +94,25 @@ while True:
         
 
         output_text = " Yawn Count: " + str(yawns + 1)
+        firebase.put('','Yawn',yawns+1)
 
         myScreenshot = pyautogui.screenshot()
-        blob = bucket.blob('pic.png')
-        blob.upload_from_file(myScreenshot)
+        myScreenshot.save('/Users/tee/Downloads/Yawn-Detector-master/image'+str(yawns+1)+'.png')
+        #blob = bucket.blob('pic.png')
+        #blob.upload_from_file(myScreenshot)
 
         # your variables are already assigned before this
-        firebase.put('','Yawn',yawns+1)
+
+        # posting to firebase storage
+        imageBlob = bucket.blob("/")
+        # imagePath = [os.path.join(self.path,f) for f in os.listdir(self.path)]
+        imagePath = '/Users/tee/Downloads/Yawn-Detector-master/image'+str(yawns+1)+'.png'
+        imageBlob = bucket.blob('image'+str(yawns+1)+'.png')
+        imageBlob.upload_from_filename(imagePath)
+        imageBlob.make_public()
+        print("Blob {} is publicly accessible at {}".format(imageBlob.name, imageBlob.public_url))
+
+        firebase.put('','url',imageBlob.public_url)
 
         cv2.putText(frame, output_text, (50,50),
                     cv2.FONT_HERSHEY_COMPLEX, 1,(0,255,127),2)
