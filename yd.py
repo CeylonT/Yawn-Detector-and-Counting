@@ -96,7 +96,7 @@ while True:
         output_text = " Yawn Count: " + str(yawns + 1)
         firebase.put('','Yawn',yawns+1)
 
-        myScreenshot = pyautogui.screenshot()
+        myScreenshot = pyautogui.screenshot(region=(0,100, 2600, 1400))
         myScreenshot.save('/Users/tee/Downloads/Yawn-Detector-master/image'+str(yawns+1)+'.png')
         #blob = bucket.blob('pic.png')
         #blob.upload_from_file(myScreenshot)
